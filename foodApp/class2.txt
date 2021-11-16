@@ -1,0 +1,173 @@
+cls2
+
+parameter route
+app.get('/user/:id', function (req, res) {
+    console.log(req.params);
+    res.send(req.params);
+})  
+//start api topic
+
+/* [Note -> when we see the amazon url when we open some products why the url is so long?]
+sol: it has url parameter it usually follows 3 sysmbols
+1) ? -> start of a query eg: user/signup/abc@jnjkdnfk (so after signup the next thing is the id)
+2) = -> it is for  key value pairs
+3) & -> it is the seperators and differentiate them eg camera & model no of camera
+
+means when user says  give me id -> id_no  so we search in the database and give the id.
+*/
+
+============================================================================================================
+API -> Application program interface
+define:-> whenever software ,apps need to communicate. they communicate through api.
+
+eg:  suppose there are 3 operating system maccbook , windows , android. we playing game in the different OS.
+Suppose mac user player move hua , toh window user ko bhi pta hona chaiye ki vo move hua hai window player. if api is not there , then for each os they have different database 
+maccbook have different database, window have different database and android have different database.
+
+so agar mac user move hota to vo apne db ko btta update krta then sare database communicate krte ki our player is moving.then all can see Mac user is moving
+but this not a good way coz pubg ke 3 database create krna which is not good idea
+
+eg2: suppose we make a social networking site say twitter, and we use in android and somebody is using in the windows and some are in the macc. so there is a 1 database and from this updation is in every devices ie called API.
+
+search the API -> github api list repositories
+=============================================================================================================
+REST API -> It follows some set of rules.
+1) anyone which follow set of rules and architecure called REST API. (90% websites used REST API)
+
+RULES FOR REST API
+1)response will be same irrespective of request source
+     (means kahin se bhi (ie window,macc,android) req aaye res same hona chaiye)
+
+2)route ('/user') should be basis on the Noun(name,place,anything) means kuch bhi nhi likh skte
+
+3)HTTP methods(get,post,patch) should be used for doing operation on these resource (jo nounds hai vo verbs ke sath apply hone chaiye ex app.get is a verb and route '/user/ is a Noun)
+
+4) REST API is in Always is in JSON format (JAVASCRIPT OBJECT NOTATION: JSON)
+5) it is Stateless.
+
+[Note:] if Normal API uses these 5 rules then we callled them that it is a REST api.
+//================================================================================================================
+
+CHANGES IN THE ABOVE CODE  && ROUTING IN EXPRESS
+
+how to make router: const router =express.router  && INDEX.HTML
+const express = require('express');
+const app = express();
+// const router = express.Router();  //used to create the router when multiple routes(get,post,patch,delete) has created
+
+app.listen('5000', function () {
+    console.log("server is listening on 5000");
+})
+
+app.use(express.json());  //app.use agar 1 aregument aara hai toh yeh chlega and agar 2 hai to routing wala execute krega
+
+const userRouter = express.Router();  //used to create the router when multiple routes(get,post,patch,delete) has created.Now we specify the route that our this userRouter have and userRouter.route().post()
+
+app.use('/user', userRouter);  //means yeh middleware throughout the function execute hota rhega  and user router ke jo bhi routes honge unke aage by default /user lga hi hoga
+
+//mounting in express
+userRouter
+    .route('/')
+    .get(getUser)  //ab route hmne upr pass kre the like app.use(/user) ab direct phle callback function aara tha eg(app.get("/user",function(req,res)) to ab hm yeh call back post me pass krege) 
+    .post(createUser)
+    .patch(updateUser)
+    .delete(deleteUser);
+
+userRouter
+    .route('/:id')
+    .get(getUserbyId)
+
+
+let user = {};
+
+// A
+app.get('/', function (req, res) {  //[server send data to client]
+    res.send('Home Page');
+})
+
+//read (CRUD OPERATION starts)
+// app.get('/user', getUser);  // [NOW: ab hum app.get('/user',getuser) n all sbka use nhi krege direct post app delete me direct function name pass krege coz hmne vo phle hi likhliya hai route app.use('/route')]
+
+function getUser(req, res) {
+    res.json(user); //B -> A nd B are same but we write in a different way
+}
+
+//post request [client -> server ko data bhjta hai or and the data comes in the request]
+//means create
+// app.post('/user', createUser);
+function createUser(req, res) {
+    user = req.body;
+    console.log(req.body);
+    res.send("data has been added successfully")
+}
+
+//patch req  [it will update by adding something]
+// app.patch('/user', updateUser);
+function updateUser (req, res) {  
+    let obj = req.body;   
+    for (let key in obj) {  
+        user[key] = obj;   
+                            
+    }
+    res.json(user)
+};
+
+//delete req
+// app.delete('/user', deleteUser);
+function deleteUser(req, res) {
+    user = {};
+    res.json(user);
+}
+
+//cls2
+//parameter route
+// app.get('/user/:id', getUserbyId);
+function getUserbyId(req, res) {  //yeh reh gya coz iska route alag bnaege coz yeh thoda different hai
+    console.log(req.params);  //so hm 1 hor userrouter bnaege USERRouter
+    res.send(req.params);
+}
+
+==============================================================================================================================
+signup Page
+
+SIGNUP FORM -> JO enteries fill kre or jo info enter krwakr signup krege and the info goes on the backend and backend stores in db
+// for this we make a route AuthRoute
+
+app.use(express.static('public')); //(FOLDER NME HI LIKHEGE DIRECT BSS -> / vgara kuch nhi)
+
+const authRouter = express.Router();
+app.use('/auth', authRouter);
+
+function signupUser(req, res) {
+    //jbhi data bhjte hai req.body me hota hai
+    // let userDetails = req.body;
+
+    // //now extract the details
+    // let name = userDetails.name;
+    // let email = userDetails.email;
+    // let password = userDetails.password; YEH JO HAI ITNA BDA NA KRKE DESTRUCTURE USE KREGE
+    let { email, name, password } = req.body;
+    user.push({ email, name, password });
+    console.log('user', req.body);
+    res.json({
+        message: "user Signedup",
+        user: req.body  //jo request . body k andr aara h vo likhege
+    })
+}
+
+/*in previous class we studied that the request which comes through the postman and if it come through front end how we will do
+  from frontend we have to send the reques in the front to the backend through the "axios or fetch"
+  here in html we will do by AXIOS  yeh hm html me likhte h
+ * jo browser (html) pr likha vo backend pr kese jaega so udr tak jane k liye hum post request lgaege
+ * and then server pr hmne routes dale hai vo udr aayega /auth/signup
+ * Server hmara listen iss route pr /auth/route and axios se bhi yeh post pass krege dono match honge or vo run hojege
+ 
+ FOR AXIOS-> WE NEED A CDN LINK SEARCH FROM GOOGLE
+
+ AND IN HTML : Jo data enter krware hai vo hmko select bhi krna pdhega or vo hum DOM Through krege
+  
+ NOTE: Ab hmne index.html different folder dala h coz iske
+  piche koi reason hai so sirf express ke andr jo public folder hai vohi usee kre
+ so we use : app.use(express.static('folder name path'));   //and agar hm idr udr hote to full path dete but abhi hm usi folder me hai
+ or static is used because the file is in different folder and (FOLDER NME HI LIKHEGE DIRECT BSS -> / vgara kuch nhi)
+ */
