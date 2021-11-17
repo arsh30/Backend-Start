@@ -1,0 +1,27 @@
+CLASS 3
+//TODAY WHAT WE DO -> MAKE 404 PAGE 2) REDIRECT 3)MIDDLEWARE 4) MONGO DB
+
+doubt: Nodemon server changes catch krta hai and means script me ik html file hai to one time execute hogi 
+
+1.) 404 PAGE -> means jb koi bhi page mangwate hai (get req) se mangwate h eg kisi ne /user/abcd  search krra h and abcd koi faltu route hai to kuch open nahi hoga so 
+agar kuch na chle to 404 page aaje. yeh sabse last me dalege server ke 
+or how we write this : through [app.use]
+
+app.use(function (req, res) {
+    res.sendFile('./public/404.html', { root: __dirname });
+})
+
+[NOTE: Script Top to Bottom run hoti jidr route match hoje vo execute hojega]
+app.use har baar chlta throughout the script]
+
+//===========================================================================================
+2) REDIRECT-> suppose we have a very famous website and our website link are embedded in some other websites eg.: for more infor click on this link toh vo wesite pr route hai (/user-all/)
+and after some time we updated the route say (/user) and jo hmari website link h vo dusri jgh emedded hai to 404 page mil jaega but aisa nahi hai
+means jo /user-all pr aaye to vo REDIRECT hoje /user pr automatically that is called REDIRECT page
+
+js me : function kahin bhi likh skte hai it is not neccesary
+
+//Redirect
+app.get('/user-all', function(req, res){
+    res.redirect('/user');  //meaans whenever someone has clicked on the the route /user-all it will automatically redirect to / user
+})  //jb redirect toh yeh server file dubara execute hoti hai top to bottom

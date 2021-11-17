@@ -133,7 +133,7 @@ signup Page
 SIGNUP FORM -> JO enteries fill kre or jo info enter krwakr signup krege and the info goes on the backend and backend stores in db
 // for this we make a route AuthRoute
 
-app.use(express.static('public')); //(FOLDER NME HI LIKHEGE DIRECT BSS -> / vgara kuch nhi)
+app.use(express.static('public')); //(FOLDER NME HI LIKHEGE DIRECT BSS -> / vgara kuch nhi) or yeh Express me feature h bydefault yeh index.html hi server krega
 
 const authRouter = express.Router();
 app.use('/auth', authRouter);
