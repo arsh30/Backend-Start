@@ -151,7 +151,7 @@ function signupUser(req, res) {
     console.log('user', req.body);
     res.json({
         message: "user Signedup",
-        user: req.body  //jo request . body k andr aara h vo likhege
+        user: req.body  //jo request . body k andr aara h vo likhege or yeh front end ko milega key hm kuch bhi de skte hai eg(user)
     })
 }
 

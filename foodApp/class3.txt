@@ -1,6 +1,8 @@
 CLASS 3
 //TODAY WHAT WE DO -> MAKE 404 PAGE 2) REDIRECT 3)MIDDLEWARE 4) MONGO DB
 
+#[ASYNC means function 1 by 1 krke run hota serial wise.]
+
 doubt: Nodemon server changes catch krta hai and means script me ik html file hai to one time execute hogi 
 
 1.) 404 PAGE -> means jb koi bhi page mangwate hai (get req) se mangwate h eg kisi ne /user/abcd  search krra h and abcd koi faltu route hai to kuch open nahi hoga so 
@@ -11,7 +13,7 @@ app.use(function (req, res) {
     res.sendFile('./public/404.html', { root: __dirname });
 })
 
-[NOTE: Script Top to Bottom run hoti jidr route match hoje vo execute hojega]
+#[NOTE: Script Top to Bottom run hoti jidr route match hoje vo execute hojega]
 app.use har baar chlta throughout the script]
 
 //===========================================================================================
@@ -25,3 +27,63 @@ js me : function kahin bhi likh skte hai it is not neccesary
 app.get('/user-all', function(req, res){
     res.redirect('/user');  //meaans whenever someone has clicked on the the route /user-all it will automatically redirect to / user
 })  //jb redirect toh yeh server file dubara execute hoti hai top to bottom
+
+//====================================================================================================================
+
+3) MIDDLEWARE: -> means server ke pass requestt aayi toh usse phle ya usse baad me hum yeh lga skte hai
+
+Define: 1. middleware function run on server
+2. function run prior to the request or after,, response browser pr jane se phle
+
+eg: app.use(function)  means agar yeh kuch res nhi bhjega to niche jaega
+        |
+    app.get('/',function)  agar isne kuch res bhja to niche wala execute nhi hoga and if it will not send then it goes below
+        |
+    app.use(function)   finally yeh return krdega agar resposne bhja toh agar yeh bhi nhi bhjta to website hanging state me aajegi
+
+[Note]: in Express every function is a middleware eg: app.get('/',callback function) and callback is a middleware function because middleware is kuch kaam hora hota h uske bich me ya baad me chl jana chaiye
+middleware tbhi terminate krta hai jb respose aara hoega response bhja to terminate hojega
+
+//USAGE OF MIDDLEWARE:
+1. To Serve static fileS(eg 404 page)
+2. Error Handling  
+3. req, res me jo kuch bhi hai unko change kr skta hai
+4. authentication: making cookies and sessions[COOKIES AND sessions are 3rd party middleware coz yeh express doesnot have these middle ware]
+
+login bypass na ho for this also used middle wware eg if we have a pepcoding portal login acces and copy link url and someone can paste in their url so he cannot open that id
+define: - middleware perform some operation on request and response and then call the next() function;
+
+3.1) app.use(function (req, res,next) {  //this middleware aate hi run hojega or niche kuch chlega hi nhi ab isme 3rd parameter hot hai next
+     //do some work
+     console.log("i am a middleware function 2nd time");
+     next();  //yeh next krne se next function execute hojega
+});
+=============================================================================================================================================================
+
+    hw: create forgetPassowrd html and sendfile to backend and do get forgetPassowrd and post forgetPassowrd
+
+function postForgetPassword(req, res , next) {
+    let data = req.body;
+    //1) means data me abhi kuch bhi ara hai random . 
+    // so our concern is  suppose we have a data base then what will our first work to do so phle ik middleware lgaege vo btaega ki correct hai ya nahi so we will pass parameter next
+    //2)database pr jaege yeh database me exist kti hai bhi ya nahi or yeh krne se phle yeh bhi check krege ki id hi bhji hai na aur kuch to nahi bhjdiya
+
+    console.log('data', data);
+    next(); //upr pass krege is wale parameter me
+    //  res.json({
+    //     message: "data recieved",
+    //     data: data.email  //data me bss email that we vo bhji
+    // })
+}
+
+function validateEmail(req, res) {  //isme jo request or response hai vo upr wale ka hi aata exact because next parameter in this function comes right here
+    console.log('validate function email'); or isko route postForgetPassword ke baad yeh function name likhege
+    console.log(req.body);
+
+    //to check email is correct or not means @ hai ya nahi or ya (.com) ho
+ 
+    res.json({
+        message: "data recieved",
+        data: req.body  //data me bss email that we vo bhji
+    })
+}
