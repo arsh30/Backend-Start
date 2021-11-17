@@ -87,3 +87,200 @@ function validateEmail(req, res) {  //isme jo request or response hai vo upr wal
         data: req.body  //data me bss email that we vo bhji
     })
 }
+
+==========================================================================================================
+MONGO DB START
+
+1) It is a database.and used to store data eg(login page: in this page we have name,email,pass and to store this we need a database).
+
+2.) MONGO DB is a no sql database means(sql have table that contains rows and columns) on the other we have No squal which contains data
+in the object format {
+    data: arsh
+}
+
+3.) firebase vs mongo db?
+Ans.) firebase is a realtime and cloudbase
+ b) mongodb is also cloud based and realtime.
+    2mongo db is more secure. mongo db atlas is a cloud base means we store the data in the cloud and atlas is free
+    3mongodb atlas storage upto 512 mb.
+
+4) when we use sql and no sql?
+sol) SQL->1) it has table in that it contains rows or columns
+          2) if we want 0 reduncy then use sql
+          3) cheaper
+          4)sql is more secure
+          5) searching is better
+
+    NO SQL-> it is in object form 
+    2) doenot have  rows and columns
+    3) it is very fast if we have some real time work  and updation is very fast then we use this.
+    4) costlier
+    5)less sequre
+    6) if we have 5 objects then it will traverse 1 by 1 and will see that the data is exist or not
+
+REAL TIME: Means if we press a button and we see that press happening 
+/==================
+
+HOMEWORK: READ STUDY ABOUT : Mongoose -> schema, model,document,cluster,collection
+
+HOW TO MAKE ACCOUNT ON MONGODB atlas
+
+make account -> create project : foodAppIntro -> create : new cluster : choose free : mumbai provider : create cluster then connect
+
+//===========================
+HOW WE USE MONGO DB?
+sol) to connect mongodb and nodejs we use mongoose. (coz phle mongodb or nodejs ko connect hone k liye ik code likhna pdhta tha so free from this mongooose will come)
+
+
+
+//==============================================================================================
+# WHOLE CODE OF CLASS 3:
+
+const express = require("express");
+const app = express();
+
+app.listen("5000", function () {
+  console.log("server is listening on 5000");
+});
+
+app.use(express.json());
+app.use(function (req, res,next) {  //this middleware aate hi run hojega or niche kuch chlega hi nhi ab isme 3rd parameter hot hai next
+   //do some work
+    console.log("i am a middleware function");
+    next();  //yeh next krne se next function execute hojega
+});
+
+app.use(express.static("public"));
+const userRouter = express.Router(); 
+const authRouter = express.Router();
+
+// app.use(function (req, res,next) { 
+//     //do some work
+//      console.log("i am a middleware function 2nd time");
+//      next(); 
+// });
+ 
+app.use("/user", userRouter);
+app.use("/auth", authRouter);
+
+//mounting in express
+userRouter
+  .route("/")
+  .get(getUser)
+  .post(createUser)
+  .patch(updateUser)
+  .delete(deleteUser);
+
+userRouter
+    .route("/:id")
+    .get(getUserbyId);
+
+authRouter
+    .route("/signup")
+    .post(signupUser);
+
+authRouter
+    .route('/forgetPassword')
+    .get(getForgetPassword)
+    .post(postForgetPassword,validateEmail);
+
+let user = [];
+
+// A
+app.get("/", function (req, res) {
+  //[server send data to client]
+  res.send("Home Page");
+});
+
+//(CRUD OPERATION starts)
+
+//read
+// app.get('/user', getUser);
+function getUser(req, res) {
+  console.log("getUser called");
+    res.json(user); //B -> A nd B are same but we write in a different way
+}
+
+//post request [client -> server ko data bhjta hai or and the data comes in the request]
+//means create
+
+// app.post('/user', createUser);
+function createUser(req, res) {
+  user = req.body;
+  console.log(req.body);
+  res.send("data has been added successfully");
+}
+
+//patch req  [it will update by adding something]
+
+// app.patch('/user', updateUser);
+function updateUser(req, res) {
+  let obj = req.body;
+  for (let key in obj) {
+    user[key] = obj;
+  }
+  res.json(user);
+}
+//delete req
+// app.delete('/user', deleteUser);
+function deleteUser(req, res) {
+  user = {};
+  res.json(user);
+}
+
+//parameter route
+// app.get('/user/:id', getUserbyId);
+function getUserbyId(req, res) {
+  console.log(req.params);
+  res.send(req.params);
+}
+
+function signupUser(req, res) {
+  // let userDetails = req.body;
+  // let name = userDetails.name;
+  // let email = userDetails.email;
+  // let password = userDetails.password;
+  let { email, name, password } = req.body;
+  user.push({ email, name, password });
+  console.log("user", req.body);
+  res.json({
+    message: "user Signedup",
+    user : req.body,  
+  });
+}
+
+function getForgetPassword(req, res) {  //fetch only file
+    res.sendFile('/public/forgetPassword.html', { root: __dirname });
+}
+function postForgetPassword(req, res , next) {
+    let data = req.body;
+
+    console.log('data', data);
+    next(); //upr pass krege
+    //  res.json({
+    //     message: "data recieved",
+    //     data: data.email  
+    // })
+}
+
+function validateEmail(req, res) { 
+    console.log('validate function email');
+    console.log(req.body);
+
+    //to check email is correct or not means @ hai ya nahi or ya (.com) ho
+ 
+    res.json({
+        message: "data recieved",
+        data: req.body
+    })
+}
+
+//Redirect
+app.get("/user-all", function (req, res) {
+  res.redirect("/user");
+});
+
+//404 Page
+app.use(function (req, res) {
+  res.sendFile("./public/404.html", { root: __dirname });
+});
