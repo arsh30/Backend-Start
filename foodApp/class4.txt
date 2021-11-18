@@ -1,0 +1,445 @@
+20th sept/ 2021
+
+Mongoose: 
+1) collection and document: eg in SQL : table -> id | name
+                                    1  | arsh
+                                    2  | simran  
+
+to this represent in No sql : {
+                                    {
+                                        id : 1
+                                        name: arsh
+                                    }
+                                     {
+                                         id: 2
+                                         name: simran
+                                     }
+                                }
+if 1 there is 1 entry in no sql we called documents. and when there is multiple enteries we called them collections.
+
+2) Build Database through cluster.
+3) why use mongoose: Mongo db  -> isme data jo aata hai vo BSON format hota hai -> so we Mongoose that convert BSON in JSON . so in JSON we apply theory thats why we doesnot use MONGODB direct.
+4) BSON me convert krke mongodb ko deta hai ie called ODM. Object data modelling
+
+//======================================
+AFTER MAKE CLUSTER : Network Access -> Edit -> Access EntryList (do this 0.0.0.0/0 -> if it didnot happen then make it to 0.0.0.0/0 ie called white Listening )
+
+2) Go In Database Access -> add a new database : select username , Password -> autogenerate -> Do update user
+
+3) GO in Network Access -> Edit -> Make sure that it is 0.0.0.0/0
+4) then come in Database Access -> choose atlas admin
+5) Comes on Deployment -> database -> connect your app -> copy link
+
+
+//=========================================
+# MAke folder Models: all files related to mongoose  kept in models
+2) make file : userModel.js 
+3) npm i monggose: to communicate through mongo db
+4) mongoose.connect (db_link).then(function(db){  //mongoose ke sare function promise based hote hai to hm (.then) use krte hai or 1 callback function milega usme db milta hai
+    log('db is connect')
+}) and agar error hai toh catch krege error ko
+
+run in terminal : node usermodels.js
+
+//=========================================
+schema: -> Schema we have some Set OF rules like konsi field konsa type hoga vo hoga
+model: -> uski implementation kese hogi
+
+# SCHMA -> it is blueprint(skeleton). that how are data look like. and it is very helpful in validation means security.
+eg: {
+    data-> id : datatype,
+            name: datatype,
+            age: datatype
+}
+> validation eg: minimu 6 length ka passowrd hona chaiye ,@ hona chaiye
+> it also help in performing doing CRUD operations.and db se baat krega
+
+#modals -> interface for interacting with the database.
+[database-> schema btaya kesa dikhega ab isse modal bnao,and model communicate krega mongodb se]
+> database se se query layega. or kya data aayega query krke
+
+//==================================================
+WORK IN userModel
+:eg :we created signup user form: that includes name, email , password, confirm password. to yeh sab hm define krege schema me
+id : datatype,
+            name: {datatype},
+            age: {datatype}
+            }  ab mongodb me jo data aayega vo issi format me save hoga
+
+[note: obkect id : mongoose unique id har ik id ki bnata hai,and _V: 0(yeh bhi khud bnakr deta hai)]
+
+note: agar hum code push krre hai or db link agar idhr hi dede usrmodel me toh boht sare scripter hote hai unhone automation script chlayi hoti hai so jese hi unko sensitive link milega toh vo usko nikallege
+or wrong istmal krlege so we will make a file secret.js cop the db link in that
+
+const mongoose = require('mongoose');
+const db_link = require('../secret'); change to thhis -> const db = require('../secret'); then mongoose.connect(db.link).then(function () { console.log("db is connected"); });
+
+const validator = require("email-validator");
+
+mongoose.connect(db_link).then(function () {
+    console.log("db is connected");
+})
+    .catch(function (err) {
+    console.log(err);
+    })
+
+const userSchema = mongoose.Schema({
+    name: {
+        type: String,
+        require: true,  //means dalna hi pdhega   
+    },
+    age: {
+        type: Number,
+    },
+    email: {
+        type: String,
+        require: true,
+        unique: true,
+        validate: function () {  //validate ke liye yeh mongoose ka hai and function hota hai
+        return   validator.validate(this.email); // true   -> jo this hai vo iss schema ke andr ke sari cheeze hai                    //and email validate k liye 
+                            //1 site hai npm validators udr se lelenge but abhi email k liye hm npm i email validator lenege
+            
+        }
+    },
+    password: {
+        type: String,
+        require: true,
+        min: 8,   //this is validation
+    },
+    confirmPassword: {
+        type: String,
+        require: true,
+        min: 8,
+        validate: function () {
+            return this.password = this.confirmPassword  //agar sahi hoga to return krdega
+        }
+    }
+});
+
+// #make model
+const userModel = mongoose.model('userModel', userSchema);  //1st parameter is modelname kya hona chaiye , and 2nd parameter is  schema ka name aata hai
+
+
+(async function createUser() {  //to check isme hmne 1st argu kya dalla schema se dekh kr btaege ki sahi hai ya nahi mongoose me data aara hai ya nahi baad me uthakr kahi or shft krege
+    let user = {
+        name: " arsh",
+        age: 20,
+        email: "ad@gmail.com",
+        password: 12345678,
+        confirmPassword: 12345678
+    };
+
+    //ab hum user model use krege means schema uske upr crud operations chlege
+  let userObj =  await userModel.create(user);  //create se hmari collection create hoti hai: means document create hota hai and usme hm jo user bnaya usko bhjege
+    //and await lgaya coz mongoose ke sare properties await lgate hai or uske liye async lgaege
+    console.log(userObj);
+})()
+
+// createUser();  //ifese-> function ko alag se call lrne ki need nhi hai jo function likha hai usko baracket lgado uske aage
+// upr ifes lgaya hai
+
+[NOTE:  Invalid shorthand property initializer: how to resolve this > secret.js  me export kra tha so vo ik object hai: toh link ke aage " : (colon)" will put
+and is it is and picked up and kept it as it. and usermodel me  mongoose.connect hai  vo string leta hai toh hm pura object pass krre the toh hum object ke andr se uski property nikali(by using (.)) or 2nd way hai
+ki destructure krlo ie const {db link} and mongoose.connect me bhi yehi pass krege
+const {db_link} = require('../secret');
+mongoose.connect(db_link). ]]
+//==================================================
+SECRET.JS 
+
+copy the link and paste in secret.js and do require the link in usermodal.js
+
+//=================================================
+
+  NOW MAKE gitignore-> and put the secret.js into it & when we upload the link it will not upload to the git
+==========================================================
+
+//MAKE MIDDLEWARE function before signup user
+function setCreatedAt(req, res, next) {  //this middleware make because we want to make sure that it will run before signupuser and it gives the time  when the user has created the account
+  req.body.createdAt = new Date().toISOString();  //created at ik field bni hai jbhi hmara new user signup krega to pta lgjayega ki iss time yeh account bna tha
+  next();   //.createdAt -> ik key/field bnai usme value aayega or isko schema me bhi bnaege and new Date is javascript function jo date lakr dega
+}
+
+[NOTE: Each function should have in the try catch block]
+
+function setCreatedAt(req, res, next) { 
+  let obj = req.body;
+  let length = Object.keys(obj).length;
+  if (length == 0) {
+    return res.status(400).json({ message: "cannot create if user is empty" });
+  }
+  req.body.createdAt = new Date().toISOString();
+  next();  
+}
+
+async function signupUser(req, res) {   
+  let userObj = req.body;  //destructure
+  //  user.push({ email, name, password }); now we are doing that when data came and when we close the data it also vanish the the data
+    // so instead of this we save the data in database
+  try {
+    //put all data in database
+    let userObj = await userModel.create(user);  //yeh db me dalega yeh
+    // console.log("user", req.body);
+    res.json({
+      message: "user Signedup",
+      user: userObj,
+    });
+  } catch (err) {
+    console.log(err)
+    res.json({
+      message: err.message  //isme error message hota hai vo bhja
+    })
+  }
+}
+
+//FINISH CLASS 4==================================================================================================
+
+#WHOLE CODE:->  SERVER.JS
+                    const express = require("express");
+const app = express();
+
+app.listen("5000", function () {
+  console.log("server is listening on 5000");
+});
+
+app.use(express.json());
+app.use(function (req, res,next) {  //this middleware aate hi run hojega or niche kuch chlega hi nhi ab isme 3rd parameter hot hai next
+   //do some work
+    console.log("i am a middleware function");
+    next(); 
+});
+
+app.use(express.static("public"));
+const userRouter = express.Router(); 
+const authRouter = express.Router();
+
+// app.use(function (req, res,next) { 
+//     //do some work
+//      console.log("i am a middleware function 2nd time");
+//      next(); 
+// });
+ 
+app.use("/user", userRouter);
+app.use("/auth", authRouter);
+
+//mounting in express
+userRouter
+  .route("/")
+  .get(getUser)
+  .post(createUser)
+  .patch(updateUser)
+  .delete(deleteUser);
+
+userRouter
+    .route("/:id")
+    .get(getUserbyId);
+
+authRouter
+    .route("/signup")
+    .post(setCreatedAt,signupUser);
+
+authRouter
+    .route('/forgetPassword')
+    .get(getForgetPassword)
+    .post(postForgetPassword,validateEmail);
+
+let user = [];
+
+// A
+app.get("/", function (req, res) {
+  //[server send data to client]
+  res.send("Home Page");
+});
+
+//(CRUD OPERATION starts)
+
+//read
+// app.get('/user', getUser);
+function getUser(req, res) {
+  console.log("getUser called");
+    res.json(user); //B -> A nd B are same but we write in a different way
+}
+
+//post request [client -> server ko data bhjta hai or and the data comes in the request]
+//means create
+
+// app.post('/user', createUser);
+function createUser(req, res) {
+  user = req.body;
+  console.log(req.body);
+  res.send("data has been added successfully");
+}
+
+//patch req  [it will update by adding something]
+
+// app.patch('/user', updateUser);
+function updateUser(req, res) {
+  let obj = req.body;
+  for (let key in obj) {
+    user[key] = obj;
+  }
+  res.json(user);
+}
+//delete req
+// app.delete('/user', deleteUser);
+function deleteUser(req, res) {
+  user = {};
+  res.json(user);
+}
+
+//parameter route
+// app.get('/user/:id', getUserbyId);
+function getUserbyId(req, res) {
+  console.log(req.params);
+  res.send(req.params);
+}
+
+function setCreatedAt(req, res, next) { 
+  let obj = req.body;  //request body me sab aagya
+  let length = Object.keys(obj).length;  //object ki keys lekr aaye yeh hmko ik array dega (name,email,passowrd) to check this ki data empty toh nhi aara
+  if (length == 0) {
+    return res.status(400).json({ message: "cannot create if user is empty" });
+  }
+  req.body.createdAt = new Date().toISOString();
+  next();  
+}
+
+const userModel = require('./models/usermodel');
+async function signupUser(req, res) {   
+  let userObj = req.body;  //destructure
+  //  user.push({ email, name, password }); now we are doing that when data came and when we close the data it also vanish the the data
+    // so instead of this we save the data in database
+  try {
+    //put all data in database
+    // create document im userModel
+    let user = await userModel.create(userObj);  //yeh db me dalega yeh
+    console.log("user", user);
+    res.json({
+      message: "user Signedup",
+      user:  userObj
+    });
+  } catch (err) {
+    console.log(err)
+    res.json({
+      message: err.message
+    })
+  }
+}
+
+function getForgetPassword(req, res) {  //fetch only file
+    res.sendFile('/public/forgetPassword.html', { root: __dirname });
+}
+
+function postForgetPassword(req, res , next) {
+    let data = req.body;
+
+    console.log('data', data);
+    next(); //upr pass krege
+    //  res.json({
+    //     message: "data recieved",
+    //     data: data.email  
+    // })
+}
+
+function validateEmail(req, res) { 
+    console.log('validate function email');
+    console.log(req.body);
+
+    //to check email is correct or not means @ hai ya nahi or ya (.com) ho
+ 
+    res.json({
+        message: "data recieved",
+        data: req.body
+    })
+}
+
+//Redirect
+app.get("/user-all", function (req, res) {
+  res.redirect("/user");
+});
+
+//404 Page
+app.use(function (req, res) {
+  res.sendFile("./public/404.html", { root: __dirname });
+});
+
+
+==================================================================================
+
+[NOTE: IF WE REQUIRE THE FILE THEN IT WILL EXECUTE THE WHOLE FILE]
+
+usermodal.JS CODE:-> const mongoose = require('mongoose');
+const {db_link} = require('../secret');
+
+const validator = require("email-validator");
+
+mongoose.connect(db_link).then(function () {
+    console.log("db is connected");
+})
+    .catch(function (err) {
+    console.log(err);
+    })
+
+const userSchema = mongoose.Schema({
+    name: {
+        type: String,
+        require: true,  //means dalna hi pdhega   
+    },
+    age: {
+        type: Number,
+    },
+    email: {
+        type: String,
+        require: true,
+        unique: true,
+        validate: function () {  //validate ke liye yeh mongoose ka hai and function hota hai
+        return   validator.validate(this.email); // true   -> jo this hai vo iss schema ke andr ke sari cheeze hai                    //and email validate k liye 
+                            //1 site hai npm validators udr se lelenge but abhi email k liye hm npm i email validator lenege
+            
+        }
+    }, createdAt: {
+        type:String  //coz hm chahte h yeh mongo pr show ho
+    },
+    password: {
+        type: String,
+        require: true,
+        min: 8,   //this is validation
+    },
+    confirmPassword: {
+        type: String,
+        require: true,
+        min: 8,
+        validate: function () {
+            return this.password = this.confirmPassword  //agar sahi hoga to return krdega
+        }
+    }
+});
+
+//hooks -> pre is mongoose concept and express is middleware concept
+userSchema.pre('save', function () {  //save is a event listner
+    this.confirmPassword = undefined;  //"empty nhi kr skte because it is object or usme which is not possible"
+})
+
+// #make model
+const userModel = mongoose.model('userModel', userSchema);  //1st parameter is modelname kya hona chaiye , and 2nd parameter is  schema ka name aata hai
+
+
+// (async function createUser() {  //to check isme hmne 1st argu kya dalla schema se dekh kr btaege ki sahi hai ya nahi mongoose me data aara hai ya nahi baad me uthakr kahi or shft krege
+//     let user = {
+//         name: " arsh",
+//         age: 20,
+//         email: "as3@gmail.com",
+//         password: 12345678,
+//         confirmPassword: 12345678
+//     };
+//     console.log(userObj);
+// })()
+
+// createUser(); 
+
+//confirm password ki need nahi database me rakhne ki only used to check the data whether it is correct or not so we use hooks
+// pre hooks -> jb request aayegi tab schema bnjega mongo db pr jane se phle yeh check krega ki yeh sahi tha ya nahi agar sahi tha to confirm password ko empty krdenge jisse save nhi hoga
+// hooks are used for unnecesaary condition which we dont want to upload
+
+
+//export the user modal file
+module.exports = userModel;

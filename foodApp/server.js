@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(function (req, res,next) {  //this middleware aate hi run hojega or niche kuch chlega hi nhi ab isme 3rd parameter hot hai next
    //do some work
     console.log("i am a middleware function");
-    next();  //yeh next krne se next function execute hojega
+    next(); 
 });
 
 app.use(express.static("public"));
@@ -39,7 +39,7 @@ userRouter
 
 authRouter
     .route("/signup")
-    .post(signupUser);
+    .post(setCreatedAt,signupUser);
 
 authRouter
     .route('/forgetPassword')
@@ -97,23 +97,42 @@ function getUserbyId(req, res) {
   res.send(req.params);
 }
 
-function signupUser(req, res) {
-  // let userDetails = req.body;
-  // let name = userDetails.name;
-  // let email = userDetails.email;
-  // let password = userDetails.password;
-  let { email, name, password } = req.body;
-  user.push({ email, name, password });
-  console.log("user", req.body);
-  res.json({
-    message: "user Signedup",
-    user : req.body,  
-  });
+function setCreatedAt(req, res, next) { 
+  let obj = req.body;  
+  let length = Object.keys(obj).length;  
+  if (length == 0) {
+    return res.status(400).json({ message: "cannot create if user is empty" });
+  }
+  req.body.createdAt = new Date().toISOString();
+  next();  
+}
+
+const userModel = require('./models/usermodel');
+async function signupUser(req, res) {   
+  let userObj = req.body;  //destructure
+  //  user.push({ email, name, password });
+    // so instead of this we save the data in database
+  try {
+    //put all data in database
+    // create document im userModel
+    let user = await userModel.create(userObj); 
+    console.log("user", user);
+    res.json({
+      message: "user Signedup",
+      user:  userObj
+    });
+  } catch (err) {
+    console.log(err)
+    res.json({
+      message: err.message
+    })
+  }
 }
 
 function getForgetPassword(req, res) {  //fetch only file
     res.sendFile('/public/forgetPassword.html', { root: __dirname });
 }
+
 function postForgetPassword(req, res , next) {
     let data = req.body;
 
