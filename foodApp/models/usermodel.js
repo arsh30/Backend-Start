@@ -18,8 +18,8 @@ const userSchema = mongoose.Schema({
     age: {
         type: Number,
     },
-    email: {
-        type: String,
+    email: {     
+        type: String,   
         require: true,
         unique: true,
         validate: function () {  

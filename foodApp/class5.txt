@@ -1,0 +1,132 @@
+21 sept
+
+HOMEWORK: ,find,findOne, update, delete
+
+//we already do the signup user && forgetPassword
+//what we do today: 1 make schema 2) implement function: user login, getuser, protectRoute 3) cookies && Jwt(Very Important topic) 
+
+# 1 plan.json -> make schema of plan.json
+
+#2) Now Arrange the code
+
+2.1) Make sepearate route folder : user router :
+            int this we put the userRouter routes from server.js and keep it in userRouter.js
+            and all function ko bhi le jaege userRouter ke 
+            and hum last me module.exports = userRouter;
+            or server.js me require krlege
+
+            const userRouter = require('./Routers/userRouter');
+
+
+===========================================
+
+# implement LOGIN function
+
+async function loginUser(req, res) {
+  try {
+    //login time hm email or password dalege
+    if (req.body.email) {
+      //hm dekhre hai email aaya if yes
+      let user = await userModel.findOne({ email: req.body.email }); // uss email ko nikala db se or jo pass word hai usko match krwaege then bolege succesffully login krliya hai
+      //:email nikali: hai or vo aayegi: request ki body se and userModel is database function so it goes there and find , so we will make this await
+      if (user) {
+        //agar user exist krta hai
+        //req.body.password : yeh hmara Frontend && user.password jo hai : it is backend
+        if (req.body.password == user.password) {
+          //agar hmko user ki body se password aarha hai usko match krege database me jo password hai agar match hogya toh login krdo
+          return res.json({
+            //toh response bhj diya
+            message: "userlogged in",
+          });
+        } else {
+          return res.json({
+            message: "email or password is wrong", //if password does not match show this error
+          });
+        }
+      } else {
+        return res.json({
+          message: "email or password is incorrect",
+        });
+      }
+    } else {
+      res.json({
+        message: "user is not presented", //now put all these in a try catch block
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({   //return is optional if we want to write we can
+      message: err.message,
+    });
+  } 
+}
+
+
+============================
+2) Implement get users -> in userRouter
+//(CRUD OPERATION starts)
+//read
+// app.get('/user', getUser);   -> in this we send all the userArray
+async function getUser(req, res) {
+    console.log("getUser called");
+      res.json(user); //B -> A nd B are same but we write in a different way
+}
+This function : all user ko lekr aana hai because admin ko dekhna pdhega ki konse konse user hai
+[All the users will have to be brought from the database, unfortunately the admin will have to see which users exit]
+
+//Now update this: we need database so we require this
+const userModel = require('../models/usermodel');
+
+async function getUsers(req, res) {
+  try {
+    console.log("getUser called");
+    let users = await userModel.find(); //find se sab aajega jo database me hai sare users dega
+    if (users) {  //jo managwaya hai json data me aayega
+      return res.json(users); //return is optional : better that you apply await because function is async so async ke sath lgate hai return
+    } else {
+      return res.json({
+        message: "user not found",
+      });
+    }
+  } catch (err) {
+    return res.json({
+      message: err.message,
+    });
+  }
+}
+
+//TO CHECK THIS RUN THROUGH POST MAN: localhost:5000/user/
+//Now do login -> localhost:5000/auth/login -> in body we send pass and email
+
+
+//================================================================
+
+# SECURITY CONCERNS:->
+1) Now password is in the plain test so we want that when we upload password to database it is in the encrypted from
+so for this, we use npm bigcrypt
+
+2) when we go on (localhost:5000/user/) this it will give the details of all the users. so want we want, information about the user can be seen by the person who login
+so for this we will make protect Route (int this we will check that the user is logged in or not).
+
+
+so in userRouter: make protect route function
+
+let flag = false; //assuming initaially the user is logged in and it will be remove because we introduce tokens
+function protectRoute(req, res, next) {
+  try {
+    if (flag) {
+      //means if flag has true then only logged in
+      next();
+    } else {
+      res.json({
+        message: "Operation Not Allowed",
+      });
+    }
+  } catch (err) {
+    return res.json({
+      message: err.message,
+    });
+  }
+}
+
+====================================================================================================
+#TOKENS:

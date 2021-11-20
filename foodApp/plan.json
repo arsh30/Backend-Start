@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "name":"premium",
+        "rating": 7,
+        "price":100,
+        "delivery": true,
+        "meals" : 3,
+        "description":"sndhndjsnkjd"
+    },
+    {
+        "id": 2,
+        "name":"vegan",
+        "rating": 7,
+        "price":150,
+        "delivery": true,
+        "meals" : 3,
+        "description":"sndhndjsnkjd"
+    },
+    {
+        "id": 3,
+        "name":"Organic",
+        "rating": 7,
+        "price":200,
+        "delivery": true,
+        "meals" : 3,
+        "description":"sndhndjsnkjd"
+    }
+]
