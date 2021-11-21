@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser()); 
+
 app.listen("5000", function () {
   console.log("server is listening on 5000");
 });

@@ -80,6 +80,7 @@ async function loginUser(req, res) {
       let user = await userModel.findOne({ email: req.body.email });
       if (user) {
         if (req.body.password == user.password) {
+          res.cookie("login", "1234", { httpOnly: true });
           return res.json({
             message: "userlogged in",
           });
@@ -102,9 +103,7 @@ async function loginUser(req, res) {
     return res.status(500).json({
       message: err.message,
     });
-  } 
+  }
 }
-
-
 
 module.exports = authRouter;

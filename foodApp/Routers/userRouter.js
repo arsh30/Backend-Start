@@ -66,12 +66,17 @@ function getUserbyId(req, res) {
   res.send(req.params);
 }
 
-let flag = false;
+// let flag = true;
 function protectRoute(req, res, next) {
   try {
-    if (flag) {
-      //means if flag has true then only logged in
-      next();
+    if (req.cookies) { //means if flag has true then only logged in
+      if (req.cookies.login == '1234') {
+        next();  
+      } else {
+        res.json({
+          message:"Not Authorized"
+        })
+      }
     } else {
       res.json({
         message: "Operation Not Allowed",

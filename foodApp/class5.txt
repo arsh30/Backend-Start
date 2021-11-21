@@ -128,5 +128,61 @@ function protectRoute(req, res, next) {
   }
 }
 
+#jo flag hai usme kuch value ie token
 ====================================================================================================
-#TOKENS:
+#TOKENS AND COOKIES:  (Img upload on image folder)
+
+Cache : 
+
+backend   ------ Frontend (suppose browser ne request(login -> email , password) krri backend ne response bhja kuch)
+and again jab hum Feeds scroll krege toh vo kisi particular user ko show honi chaiye toh again request marege. Jab scroll krega tb again request lgegi
+or dekhega ki yeh login hai ya nahi because HTTP is stateless. soo baar baar clogin krna pdhta hai so overcome from this we use 
+COOKIES.
+
+# HOW COOKIES WORK: we send the request to the server, and the server send the response via cookies. and yeh Frontend par cookies store hojegi
+and next time jb request bhjte hai tb request me cookie jati hai
+
+jab Frontend wala person yeh cookie lekr aata hai toh yeh match krta hai ki backend me jo cookie hai aur Frontend se cookie aayi hai agar same hai toh loggin krdo
+
+# When we log out from the device, the browser cookie destroy
+
+
+
+
+//=====================================================
+How to implement cookies : use: npm install cookie-parser and do require then 
+app.use(cookieParser());  isse hm cookies ko kahin se bhi use kr skte hai pure browser me [main bss server me require krege]
+
+> after this come to login function to apply cookie
+so return krne se phle hum ik cookie likh kr bhjege 
+
+>> res.cookie(1st param: is cookie name, 2nd param is -> iski unique kuch bhjte hai(Token Number), {HTTPOnly: true});  //httponly true isse koi hmare cookie vgara koi edit na kar paye browser ki(Frontend se koi ched nahi skta cookie ko)
+[2nd param: unique means jese koi TOKEN no (eg dusre ke paas bhi token hoga hmare pass bhi token agar dono same hai toh bnda hmara hai)]
+
+res.cookie('login', '1234', { httpOnly: true }); -> authRouter login function(jb login kra to cookie bhjdi)
+
+b) Now jb hm get user krege(in userRouter) hm chahte hai jo bnda login hai bss vohi dekh sake(get router  se phle protectRoute chlega usme check krege)
+
+protectRoute FUNCTION LATEST update
+// let flag = true;
+function protectRoute(req, res, next) {
+  try {
+    if (req.cookies) { //means if flag has true then only logged in
+      if (req.cookies.login == '1234') {
+        next();  
+      } else {
+        res.json({
+          message:"Not Authorized"
+        })
+      }
+    } else {
+      res.json({
+        message: "Operation Not Allowed",
+      });
+    }
+  } catch (err) {
+    return res.json({
+      message: err.message,
+    });
+  }
+}
