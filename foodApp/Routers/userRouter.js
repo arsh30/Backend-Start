@@ -1,6 +1,7 @@
 const express = require("express");
 const userModel = require("../models/usermodel");
 const userRouter = express.Router();
+const protectRoute = require('./authHelper');
 
 //router
 userRouter
@@ -66,26 +67,26 @@ function getUserbyId(req, res) {
   res.send(req.params);
 }
 
-// let flag = true;
-function protectRoute(req, res, next) {
-  try {
-    if (req.cookies) { //means if flag has true then only logged in
-      if (req.cookies.login == '1234') {
-        next();  
-      } else {
-        res.json({
-          message:"Not Authorized"
-        })
-      }
-    } else {
-      res.json({
-        message: "Operation Not Allowed",
-      });
-    }
-  } catch (err) {
-    return res.json({
-      message: err.message,
-    });
-  }
-}
+// // let flag = true;
+// function protectRoute(req, res, next) {
+//   try {
+//     if (req.cookies) { //means if flag has true then only logged in
+//       if (req.cookies.login == '1234') {
+//         next();  
+//       } else {
+//         res.json({
+//           message:"Not Authorized"
+//         })
+//       }
+//     } else {
+//       res.json({
+//         message: "Operation Not Allowed",
+//       });
+//     }
+//   } catch (err) {
+//     return res.json({
+//       message: err.message,
+//     });
+//   }
+// }
 module.exports = userRouter;

@@ -1,0 +1,76 @@
+21st sept
+
+//WHAT WE DO TODAY? 
+1) Rearrange the protectRoute (done)
+2) JWT Theory + implement (important)
+3) nodemailer
+4) get functions ie /user usme = update ,delete, find ,create user
+
+==========================================
+
+1) in userRouter, we make protectRoute function and 
+
+==========================================
+
+JWT Theory ->
+
+
+
+==========================================
+# Implement Of JWT:-- In login function which is in previous code
+
+previous code of login: async function loginUser(req, res) {
+  try {
+    //email or password
+    if (req.body.email) {
+      let user = await userModel.findOne({ email: req.body.email });
+      if (user) {
+        if (req.body.password == user.password) {
+          res.cookie("login", "1234", { httpOnly: true });
+          return res.json({
+            message: "userlogged in",
+          });
+        } else {
+          return res.json({
+            message: "email or password is wrong", //if password does not match show this error
+          });
+        }
+      } else {
+        return res.json({
+          message: "email or password is incorrect",
+        });
+      }
+    } else {
+      res.json({
+        message: "user is not presented", //now put all these in a try catch block
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+}   //isme  hum krreg the ki cookie bnai 'login'name se plus token bhjre the ie '1234' ie badrequest or isme kuch encyption nhi krre the  
+so jo Token ke liye ik secure cheeze use krni thi ie JWT
+
+# so import JWT To use: 
+
+
+
+
+
+
+
+
+
+
+
+
+===================================
+when we use cookies: jab hme koi kaam repeatdly krna pdhe toh hum cookie use krte hai taki bchna pdhe work se
+===================================
+
+# Nodemailer: It is used for send mails through server automatic
+1) npm install nodemailer , and we use SMTP protocol: to send gmail
+
+

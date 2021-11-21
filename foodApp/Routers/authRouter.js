@@ -2,6 +2,9 @@ const express = require("express");
 
 const authRouter = express.Router();
 const userModel = require("../models/usermodel");
+const jwt = require('jsonwebtoken');
+const { JWT_KEY } = require('../secret');
+const sendMail = require('../nodemailer');
 
 // ===========ROUTES==================
 authRouter.route("/signup").post(setCreatedAt, signupUser);
@@ -31,9 +34,11 @@ async function signupUser(req, res) {
   // so instead of this we save the data in database
   try {
     //put all data in database
-    // create document im userModel
+    // create document im userModel  && email bhjde
+   
     let user = await userModel.create(userObj);
     console.log("user", user);
+    sendMail(user);  //mail se phle yeh send krdege because hmne sendMail function bnaya
     res.json({
       message: "user Signedup",
       user: userObj,
@@ -80,7 +85,9 @@ async function loginUser(req, res) {
       let user = await userModel.findOne({ email: req.body.email });
       if (user) {
         if (req.body.password == user.password) {
-          res.cookie("login", "1234", { httpOnly: true });
+          let payload = user['_id'];  //user se hmne id nikali
+        let token = jwt.sign({id:payload},JWT_KEY);  //3rd option optional hai ie Algorithm kyoki bydefault yeh leta 
+          res.cookie("login", token, { httpOnly: true });   //idhr token bhja ab hum jo verify hora tha protect route me verify krege
           return res.json({
             message: "userlogged in",
           });
